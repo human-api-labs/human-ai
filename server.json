@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.human-api-labs/human-ai",
+  "title": "HUMAN API",
+  "description": "AI agents request voluntary human help for physical-world tasks with explicit human consent.",
+  "repository": {
+    "url": "https://github.com/human-api-labs/human-ai",
+    "source": "github"
+  },
+  "version": "0.2.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://human-api-labs.onrender.com/mcp"
+    }
+  ]
+}
