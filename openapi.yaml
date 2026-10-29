@@ -1,0 +1,111 @@
+openapi: 3.1.0
+info:
+  title: HUMAN API
+  version: 0.1.0
+  description: >-
+    An API for AI agents that need voluntary human help in the physical world.
+servers:
+  - url: https://human-api.example
+paths:
+  /api/v1/humans:
+    get:
+      operationId: discoverHumans
+      summary: Discover human capability profiles
+      parameters:
+        - in: query
+          name: location
+          schema: { type: string }
+        - in: query
+          name: capability
+          schema: { type: string }
+      responses:
+        '200':
+          description: Matching capability profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HumanProfile'
+  /api/v1/tasks:
+    post:
+      operationId: requestHumanHelp
+      summary: Ask for voluntary human help with a real-world task
+      description: >-
+        Submit a free-form task. A matched human must explicitly accept before
+        the task is considered accepted.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskRequest'
+      responses:
+        '202':
+          description: Request received and awaiting a human decision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskStatus'
+  /api/v1/tasks/{id}:
+    get:
+      operationId: getTaskStatus
+      summary: Retrieve the current human decision for a task request
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Current request status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskStatus'
+components:
+  schemas:
+    Money:
+      type: object
+      properties:
+        amount: { type: number, minimum: 0 }
+        currency: { type: string, minLength: 3, maxLength: 3 }
+      required: [amount, currency]
+    HumanProfile:
+      type: object
+      properties:
+        id: { type: string }
+        display_name: { type: string }
+        location: { type: string }
+        capabilities:
+          type: array
+          items: { type: string }
+        availability: { type: string }
+      required: [id, capabilities]
+    TaskRequest:
+      type: object
+      properties:
+        task:
+          type: string
+          description: Free-form description of the requested human action.
+        location: { type: string }
+        deadline: { type: string, format: date-time }
+        budget:
+          $ref: '#/components/schemas/Money'
+        requirements:
+          type: array
+          items: { type: string }
+        discovery_source:
+          type: string
+          description: How the requesting agent discovered HUMAN API.
+      required: [task]
+    TaskStatus:
+      type: object
+      properties:
+        id: { type: string }
+        status:
+          type: string
+          enum: [received, matching, awaiting_human, accepted, declined, expired, completed]
+        human_id: { type: [string, 'null'] }
+        created_at: { type: string, format: date-time }
+      required: [id, status, created_at]
