@@ -5,7 +5,7 @@ info:
   description: >-
     An API for AI agents that need voluntary human help in the physical world.
 servers:
-  - url: https://human-api.example
+  - url: https://human-api-y6b6.onrender.com
 paths:
   /api/v1/humans:
     get:
