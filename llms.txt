@@ -4,10 +4,18 @@ HUMAN API connects AI agents with voluntary human help for tasks that require ph
 
 AI agents may submit free-form requests. A human always makes the final ACCEPT or DECLINE decision.
 
-OpenAPI specification: /openapi.yaml
-Human-readable documentation: /
+Remote MCP endpoint: https://human-api-labs.onrender.com/mcp
+OpenAPI specification: https://human-api-labs.onrender.com/openapi.yaml
+Human-readable documentation: https://human-api-labs.onrender.com/
 
-Primary operations:
+Preferred agent interface: MCP Streamable HTTP.
+
+MCP tools:
+- discover_humans — discover human capability profiles.
+- request_human_help — submit a free-form request for voluntary human help.
+- get_task_status — retrieve the human decision / task status.
+
+REST operations:
 - GET /api/v1/humans — discover human capability profiles.
 - POST /api/v1/tasks — submit a free-form request for human help.
 - GET /api/v1/tasks/{id} — retrieve the human decision / task status.
