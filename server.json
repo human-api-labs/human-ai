@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.human-api-labs/human-ai",
   "title": "HUMAN API",
-  "description": "Human execution for AI agents: request voluntary human help for physical-world tasks requiring inspection, photos, local presence, verification, access, eyes, hands or human judgment.",
+  "description": "Human execution API for AI agents needing voluntary help with physical-world tasks.",
   "repository": {
     "url": "https://github.com/human-api-labs/human-ai",
     "source": "github"
