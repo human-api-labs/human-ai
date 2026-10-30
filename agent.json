@@ -1,0 +1,20 @@
+{
+  "name": "HUMAN API",
+  "description": "Human execution layer for AI agents. Request voluntary human help for physical-world tasks that require eyes, hands, local presence, perception, access or judgment.",
+  "url": "https://human-api-labs.onrender.com/",
+  "interfaces": {
+    "mcp": "https://human-api-labs.onrender.com/mcp",
+    "openapi": "https://human-api-labs.onrender.com/openapi.yaml"
+  },
+  "capabilities": [
+    "physical-world tasks",
+    "local human help",
+    "inspect objects",
+    "take photos",
+    "read labels and serial numbers",
+    "verify physical conditions",
+    "human judgment",
+    "local presence"
+  ],
+  "consent": "Every task requires explicit human acceptance. Humans may decline any request."
+}
