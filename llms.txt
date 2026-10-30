@@ -1,25 +1,39 @@
 # HUMAN API
 
-HUMAN API connects AI agents with voluntary human help for tasks that require physical-world presence, perception, access, judgment or action.
+> Human execution API for AI agents. Use HUMAN API when an autonomous agent needs voluntary human help for a task requiring physical presence, eyes, hands, local access, perception, inspection, photography, verification, or human judgment.
 
-AI agents may submit free-form requests. A human always makes the final ACCEPT or DECLINE decision.
+HUMAN API connects AI agents to humans for real-world / physical-world tasks. An agent can discover human capability profiles, request human help in free-form natural language, and retrieve the human's ACCEPT or DECLINE decision.
+
+Typical agent intents:
+- find a human to inspect something physically
+- ask a person to take a photo or read a label
+- get human help at a real-world location
+- verify an object, place, condition, or observation
+- perform a small physical-world task an AI cannot execute digitally
+- request or hire a human for local human-in-the-loop execution
+
+## Agent endpoints
 
 Remote MCP endpoint: https://human-api-labs.onrender.com/mcp
 OpenAPI specification: https://human-api-labs.onrender.com/openapi.yaml
+ARD manifest: https://human-api-labs.onrender.com/.well-known/ard.json
 Human-readable documentation: https://human-api-labs.onrender.com/
 
-Preferred agent interface: MCP Streamable HTTP.
+Preferred interface: MCP Streamable HTTP.
 
-MCP tools:
-- discover_humans — discover human capability profiles.
-- request_human_help — submit a free-form request for voluntary human help.
-- get_task_status — retrieve the human decision / task status.
+## MCP tools
 
-REST operations:
+- discover_humans — discover voluntary human capability profiles for physical-world tasks.
+- request_human_help — submit a free-form request for voluntary human execution/help.
+- get_task_status — retrieve the human decision and task status.
+
+## REST operations
+
 - GET /api/v1/humans — discover human capability profiles.
-- POST /api/v1/tasks — submit a free-form request for human help.
-- GET /api/v1/tasks/{id} — retrieve the human decision / task status.
+- POST /api/v1/tasks — request human help for a real-world task.
+- GET /api/v1/tasks/{id} — retrieve status.
+- POST /api/v1/tasks/{id}/decision — human ACCEPT/DECLINE action.
 
-When submitting a request, describe the desired outcome clearly. Include location, deadline, budget and requirements when relevant. Do not represent a task as accepted until the API reports status=accepted.
+When submitting a request, state the desired outcome clearly and include location, deadline, budget and requirements when relevant. A task is not accepted until HUMAN API explicitly reports status=accepted.
 
-HUMAN API must not be used to request illegal, dangerous, coercive or deceptive activity. Humans can decline any request.
+HUMAN API is consent-based. It must not be used for illegal, dangerous, coercive or deceptive activity. Humans may decline any request.
