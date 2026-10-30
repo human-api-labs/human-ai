@@ -1,0 +1,22 @@
+{
+  "name": "HUMAN API",
+  "description": "Human execution API for AI agents that need voluntary help in the physical world.",
+  "url": "https://human-api-labs.onrender.com/",
+  "version": "0.2.1",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false
+  },
+  "skills": [
+    {
+      "id": "request-human-help",
+      "name": "Request human help",
+      "description": "Find and request a consenting human for physical-world tasks such as inspecting an object, taking a photo, reading a label, checking a location, or applying human judgment.",
+      "tags": ["human", "physical-world", "inspection", "photo", "local", "human-in-the-loop"]
+    }
+  ],
+  "interfaces": {
+    "mcp": "https://human-api-labs.onrender.com/mcp",
+    "openapi": "https://human-api-labs.onrender.com/openapi.yaml"
+  }
+}
