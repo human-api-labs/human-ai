@@ -2,6 +2,11 @@ name: Publish HUMAN API to MCP Registry
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - server.json
+      - .github/workflows/publish-mcp.yml
 
 permissions:
   contents: read
