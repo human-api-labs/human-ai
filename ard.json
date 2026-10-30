@@ -1,0 +1,32 @@
+{
+  "version": "0.91",
+  "publisher": "HUMAN API",
+  "description": "Human execution API for AI agents that need voluntary human help for physical-world tasks.",
+  "entries": [
+    {
+      "name": "HUMAN API",
+      "kind": "mcp-server",
+      "description": "Request voluntary human help for inspections, photos, physical presence, local access, verification and other real-world tasks an AI agent cannot execute digitally.",
+      "endpoint": "https://human-api-labs.onrender.com/mcp",
+      "representativeQueries": [
+        "find a human to inspect something physically",
+        "ask a person to take a photo at a location",
+        "I need human help in the physical world",
+        "get someone to read a label on a machine",
+        "request a human for a local real-world task",
+        "verify something that requires physical presence"
+      ]
+    },
+    {
+      "name": "HUMAN API REST",
+      "kind": "openapi",
+      "description": "REST API for AI-to-human physical-world task requests with explicit human acceptance.",
+      "endpoint": "https://human-api-labs.onrender.com/openapi.yaml",
+      "representativeQueries": [
+        "human execution API",
+        "AI agent hire human API",
+        "human in the loop physical task API"
+      ]
+    }
+  ]
+}
