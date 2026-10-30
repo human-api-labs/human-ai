@@ -1,16 +1,17 @@
 openapi: 3.1.0
 info:
   title: HUMAN API
-  version: 0.1.0
+  version: 0.2.0
   description: >-
-    An API for AI agents that need voluntary human help in the physical world.
+    Human execution API for AI agents that need voluntary human help for
+    physical-world tasks requiring presence, perception, access or judgment.
 servers:
-  - url: https://human-api-y6b6.onrender.com
+  - url: https://human-api-labs.onrender.com
 paths:
   /api/v1/humans:
     get:
       operationId: discoverHumans
-      summary: Discover human capability profiles
+      summary: Discover humans for physical-world tasks
       parameters:
         - in: query
           name: location
@@ -20,37 +21,35 @@ paths:
           schema: { type: string }
       responses:
         '200':
-          description: Matching capability profiles
+          description: Matching voluntary human capability profiles
           content:
             application/json:
               schema:
                 type: array
-                items:
-                  $ref: '#/components/schemas/HumanProfile'
+                items: { $ref: '#/components/schemas/HumanProfile' }
   /api/v1/tasks:
     post:
       operationId: requestHumanHelp
-      summary: Ask for voluntary human help with a real-world task
+      summary: Request voluntary human execution of a real-world task
       description: >-
-        Submit a free-form task. A matched human must explicitly accept before
-        the task is considered accepted.
+        Use when an AI agent needs eyes, hands, physical presence, local access,
+        inspection, photography, verification or human judgment. A matched human
+        must explicitly accept before the task is considered accepted.
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/TaskRequest'
+            schema: { $ref: '#/components/schemas/TaskRequest' }
       responses:
         '202':
           description: Request received and awaiting a human decision
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/TaskStatus'
+              schema: { $ref: '#/components/schemas/TaskStatus' }
   /api/v1/tasks/{id}:
     get:
       operationId: getTaskStatus
-      summary: Retrieve the current human decision for a task request
+      summary: Retrieve the current human decision for a task
       parameters:
         - in: path
           name: id
@@ -61,8 +60,31 @@ paths:
           description: Current request status
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/TaskStatus'
+              schema: { $ref: '#/components/schemas/TaskStatus' }
+  /api/v1/tasks/{id}/decision:
+    post:
+      operationId: decideHumanTask
+      summary: Record a human ACCEPT or DECLINE decision
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                decision: { type: string, enum: [accepted, declined] }
+              required: [decision]
+      responses:
+        '200':
+          description: Human decision recorded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TaskStatus' }
 components:
   schemas:
     Money:
@@ -87,11 +109,10 @@ components:
       properties:
         task:
           type: string
-          description: Free-form description of the requested human action.
+          description: Free-form description of the requested human action and outcome.
         location: { type: string }
         deadline: { type: string, format: date-time }
-        budget:
-          $ref: '#/components/schemas/Money'
+        budget: { $ref: '#/components/schemas/Money' }
         requirements:
           type: array
           items: { type: string }
@@ -108,4 +129,5 @@ components:
           enum: [received, matching, awaiting_human, accepted, declined, expired, completed]
         human_id: { type: [string, 'null'] }
         created_at: { type: string, format: date-time }
+        decision_at: { type: [string, 'null'], format: date-time }
       required: [id, status, created_at]
