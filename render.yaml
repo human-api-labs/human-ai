@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: human-api-labs
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeployTrigger: commit
