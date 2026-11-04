@@ -1,9 +1,15 @@
 services:
   - type: web
     name: human-api-labs
-    runtime: docker
+    runtime: node
     plan: free
     region: frankfurt
-    dockerfilePath: ./Dockerfile
+    buildCommand: npm install
+    startCommand: npm start
     healthCheckPath: /health
     autoDeployTrigger: commit
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: human-api-tasks
+          property: connectionString
