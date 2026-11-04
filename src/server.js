@@ -14,7 +14,7 @@ const tasks = new Map();
 const pool = process.env.DATABASE_URL ? new pg.Pool({connectionString:process.env.DATABASE_URL}) : null;
 const dbReady = pool ? pool.query('CREATE TABLE IF NOT EXISTS human_tasks (id uuid PRIMARY KEY, payload jsonb NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())').then(()=>true).catch(e=>{console.error('Database initialization failed:',e);return false;}) : Promise.resolve(false);
 async function saveTask(task) {
-  if (!pool || !(await dbReady)) { console.warn('TASK NOT PERSISTED: DATABASE_URL unavailable'); return; }
+  if (!pool || !(await dbReady)) { throw new Error('persistent_storage_unavailable'); }
   await pool.query('INSERT INTO human_tasks(id,payload) VALUES($1,$2) ON CONFLICT(id) DO UPDATE SET payload=EXCLUDED.payload,updated_at=now()', [task.id,JSON.stringify(task)]);
 }
 async function findTask(id) {
@@ -67,7 +67,7 @@ const server=http.createServer(async(req,res)=>{
   if(url.pathname==='/mcp'){if(req.method!=='POST')return json(res,405,{error:'mcp_use_post'});try{const parsed=await body(req);const mcp=createMcpServer();const transport=new StreamableHTTPServerTransport({sessionIdGenerator:undefined,enableJsonResponse:true});res.setHeader('access-control-allow-origin','*');res.setHeader('access-control-expose-headers','mcp-session-id');await mcp.connect(transport);await transport.handleRequest(req,res,parsed);res.on('close',()=>{transport.close().catch(()=>{});mcp.close().catch(()=>{});});return;}catch(e){return json(res,500,{error:'mcp_error',detail:e.message});}}
   if(req.method==='GET'&&url.pathname==='/'){res.writeHead(200,{'content-type':'text/html; charset=utf-8'});return res.end(page());}
   if(req.method==='GET'&&url.pathname==='/admin')return textFile(res,'admin.html','text/html');
-  if(req.method==='GET'&&url.pathname==='/health')return json(res,200,{ok:true,service:'human-api',mcp:'/mcp',persistent_storage:await dbReady});
+  if(req.method==='GET'&&url.pathname==='/health'){const ready=!!(pool&&await dbReady);return json(res,ready?200:503,{ok:ready,service:'human-api',mcp:'/mcp',persistent_storage:ready,database_configured:!!pool});}
   if(req.method==='GET'&&url.pathname==='/llms.txt')return textFile(res,'llms.txt','text/plain');
   if(req.method==='GET'&&url.pathname==='/openapi.yaml')return textFile(res,'openapi.yaml','application/yaml');
   if(req.method==='GET'&&url.pathname==='/robots.txt')return textFile(res,'robots.txt','text/plain');
@@ -82,7 +82,7 @@ const server=http.createServer(async(req,res)=>{
     }catch(e){return json(res,503,{error:'database_unavailable'});}
   }
   if(req.method==='GET'&&url.pathname==='/api/v1/humans')return json(res,200,humans);
-  if(req.method==='POST'&&url.pathname==='/api/v1/tasks'){try{const input=await body(req);if(!input.task||typeof input.task!=='string')return json(res,400,{error:'task_required'});return json(res,202,await createTask(input));}catch(e){return json(res,400,{error:e.message});}}
+  if(req.method==='POST'&&url.pathname==='/api/v1/tasks'){try{const input=await body(req);if(!input.task||typeof input.task!=='string')return json(res,400,{error:'task_required'});return json(res,202,await createTask(input));}catch(e){return json(res,e.message==='persistent_storage_unavailable'?503:400,{error:e.message});}}
   const statusMatch=url.pathname.match(/^\/api\/v1\/tasks\/([^/]+)$/);if(req.method==='GET'&&statusMatch){const task=await findTask(statusMatch[1]);return task?json(res,200,task):json(res,404,{error:'task_not_found'});}
   const decisionMatch=url.pathname.match(/^\/api\/v1\/tasks\/([^/]+)\/decision$/);if(req.method==='POST'&&decisionMatch){const task=await findTask(decisionMatch[1]);if(!task)return json(res,404,{error:'task_not_found'});try{const input=await body(req);if(!process.env.ADMIN_TOKEN || (req.headers.authorization!==`Bearer ${process.env.ADMIN_TOKEN}` && input.admin_token!==process.env.ADMIN_TOKEN))return json(res,403,{error:'admin_authorization_required'});if(!['accepted','declined','completed'].includes(input.decision))return json(res,400,{error:'invalid_decision'});if(input.decision==='completed'&&task.status!=='accepted')return json(res,409,{error:'accept_first'});if(['accepted','declined'].includes(input.decision)&&task.status!=='awaiting_human')return json(res,409,{error:'already_processed'});if(input.response!==undefined&&(typeof input.response!=='string'||input.response.length>10000))return json(res,400,{error:'invalid_response'});task.status=input.decision;task.decision_at=new Date().toISOString();if(typeof input.response==='string')task.human_response=input.response.trim();await saveTask(task);tasks.set(task.id,task);console.log(JSON.stringify({event:'human_decision',id:task.id,decision:task.status}));return json(res,200,task);}catch(e){return json(res,400,{error:e.message});}}
   json(res,404,{error:'not_found'});
